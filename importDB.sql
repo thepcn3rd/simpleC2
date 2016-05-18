@@ -1,6 +1,6 @@
 CREATE DATABASE command;
 
-USE DATABASE command;
+USE command;
 
 --
 -- Table structure for table `botInfo`
@@ -14,4 +14,4 @@ CREATE TABLE `botInfo` (
   `httpResults` mediumblob,
   `executed` varchar(1) DEFAULT 'N',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;

