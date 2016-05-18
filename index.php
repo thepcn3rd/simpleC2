@@ -1,6 +1,6 @@
 <?php
 
-	include ('dbConnection.php');
+	include ('db.php');
 
 	# http://127.0.0.1/index.php?func=sync&machineID=ef4e07e5bbd6c26d01292fb56283979c4ef9ba75&osName=posix
 	if (isset($_GET["func"])) {
