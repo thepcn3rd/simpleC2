@@ -1,3 +1,4 @@
 # Configuration Files
 #####################
-*.conf
+*.conf		# Contains configuration settings...
+db.php		# Contains database passwords that should not be syncronized.
