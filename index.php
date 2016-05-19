@@ -2,7 +2,6 @@
 
 	include ('db.php');
 
-	# http://127.0.0.1/index.php?func=sync&machineID=ef4e07e5bbd6c26d01292fb56283979c4ef9ba75&osName=posix
 	if (isset($_GET["func"])) {
 		$callingFunction=$_GET['func'];	
 		if (isset($_GET["osName"])) $osName=$_GET['osName'];
@@ -47,7 +46,6 @@
 			}
 		}
 	}
-	# machineID=ef4e07e5bbd6c26d01292fb56283979c4ef9ba75&command=%0A%0Als&output=backup%0ApythonClient.py%0ApythonServer.py%0A
 	else if (isset($_POST["machineID"])) {
 		$machineID = $_POST['machineID'];
 		$httpCommand = $_POST['command'];	

