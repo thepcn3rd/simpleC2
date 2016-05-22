@@ -3,6 +3,8 @@ I developed a proof-of-concept bot, c2 server and admin control panel.  This was
 
 To Setup the Proof-of-Concept to test to see if your defenses catch the bot...
 
+Idea: Create a proxy script to relay a bot's traffic back to the controller... Black Hat Python...
+
 Setup the C2 Server
 -------------------
 1. Setup the Web Server to Host the index.php file and the MySQL Database
