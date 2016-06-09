@@ -11,7 +11,7 @@ import subprocess
 import base64
 
 sleepTime=10	# The amount of seconds to sleep between web requests
-#
+##
 # http://stackoverflow.com/questions/11735821/python-get-localhost-ip
 if os.name != "nt":
     import fcntl
