@@ -68,7 +68,7 @@ def addCommand(txtFile, osType):
     response = raw_input("Insert the new command of '" + newCommand + "'? (Y/N) ")
     if response == 'Y' or response == 'y':
         f = open(txtFile, "a")
-        f.write(newCommand + "\r\n")
+        f.write(newCommand + "\n")
         f.close()
 
 def showCommand(txtFile, osType):
@@ -96,7 +96,7 @@ def removeCommand(txtFile, osType):
     f = open(txtFile, "w")
     for i in range(0, len(commandList)):
         if not i == int(response):
-            f.write(commandList[i] + "\r\n")
+            f.write(commandList[i] + "\n")
     f.close()
 
 

@@ -1,0 +1,4 @@
+dir c:\
+ipconfig
+net user
+wmic service get caption, name, startmode, pathname | findstr /i /v svchost.exe
